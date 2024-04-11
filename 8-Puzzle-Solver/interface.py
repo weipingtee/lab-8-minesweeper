@@ -1,11 +1,9 @@
-#!/usr/bin/python3
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox, simpledialog
 
 import main
 
-### Global Variables to store the solution analytics ###
 algorithm = None
 initialState = None
 statepointer = cost = counter = depth = 0
@@ -14,10 +12,6 @@ path = []
 
 
 class InterfaceApp:
-
-    # =============================================================================================================== #
-    ###     Build the GUI     ###
-
     def __init__(self, master=None):
 
         self._job = None
@@ -27,7 +21,7 @@ class InterfaceApp:
 
         self.mainlabel = ttk.Label(self.appFrame)
         self.mainlabel.configure(
-            anchor="center", font="{Forte} 36 {bold}", foreground="#003e3e", justify="center", text='8-Puzzle Solver')
+            anchor="center", font="{Arial} 36 {bold}", foreground="#003e3e", justify="center", text='8-Puzzle Solver')
         self.mainlabel.place(anchor="center", x=300, y=50)
 
         self.backbutton = ttk.Button(self.appFrame)
@@ -71,11 +65,6 @@ class InterfaceApp:
                                  font="{@Malgun Gothic Semilight} 12 {}", justify="center", text='0 / 0')
         self.stepCount.place(anchor="center", width=200, x=300, y=440)
 
-        self.contributorsbutton = ttk.Button(self.appFrame)
-        self.contributorsbutton.configure(cursor="hand2", text='Contributors')
-        self.contributorsbutton.place(anchor="n", width=150, x=700, y=510)
-        self.contributorsbutton.bind("<ButtonPress>", self.showContributors)
-
         self.solvebutton = ttk.Button(self.appFrame)
         self.img_solveicon = tk.PhotoImage(file="assets/solve-icon.png")
         self.solvebutton.configure(cursor="hand2", text='Solve', image=self.img_solveicon, compound="top")
@@ -96,7 +85,7 @@ class InterfaceApp:
 
         self.analysisbox = ttk.Label(self.appFrame)
         self.analysisbox.configure(anchor="center", text='', background="#d6d6d6", borderwidth=3, relief="sunken")
-        self.analysisbox.place(anchor="center", width=150, height=210, x=700, y=400)
+        self.analysisbox.place(anchor="center", width=150, height=280, x=700, y=400)
 
         self.cell0 = ttk.Label(self.appFrame)
         self.cell0.configure(anchor="center", background="#5aadad", borderwidth=3,
@@ -163,9 +152,6 @@ class InterfaceApp:
         self.refreshFrame()
         self.mainwindow.after(0, app.refreshGIF, 0)
         self.mainwindow.mainloop()
-
-    # =============================================================================================================== #
-    ###     Widget Methods     ###
 
     @staticmethod
     def refreshGIF(ind):
@@ -305,17 +291,6 @@ class InterfaceApp:
             self.stopFastForward()
             statepointer = 0
             self.refreshFrame()
-
-    def showContributors(self, event=None):
-        """
-        Invoked at pressing the contributors button. Displays a message box Containing names and IDs of contributors
-        """
-        messagebox.showinfo('Contributors', "6744   -   Adham Mohamed Aly\n"
-                                            "6905   -   Mohamed Farid Abdelaziz\n"
-                                            "7140   -   Yousef Ashraf Kotp\n")
-
-    # =============================================================================================================== #
-    ###     Helper Functions     ###
 
     def displaySearchAnalysis(self, force_display=False):
         """

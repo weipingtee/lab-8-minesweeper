@@ -2,11 +2,9 @@ import heapq
 import math
 import time
 
-# Used for states generation (getChildren())
 dx = [-1, 1, 0, 0]
 dy = [0, 0, 1, -1]
 
-# Global variables holding algorithms
 dfs_counter = 0
 bfs_counter = 0
 astar_counter = 0
@@ -48,7 +46,6 @@ time_ids = 0
 time_greedy = 0
 
 
-# function to get String representation
 def getStringRepresentation(x):
     if int(math.log10(x)) + 1 == 9:
         return str(x)
@@ -56,7 +53,6 @@ def getStringRepresentation(x):
         return "0" + str(x)
 
 
-# function to generate all valid children of a certain node
 def getChildren(state):
     children = []
     idx = state.index('0')
@@ -73,7 +69,6 @@ def getChildren(state):
     return children
 
 
-# function to get the path to the goal state
 def getPath(parentMap, inputState):
     path = []
     temp = 12345678
@@ -85,20 +80,17 @@ def getPath(parentMap, inputState):
     return path
 
 
-# function to print the path to goal
 def printPath(path):
     for i in path:
         print(getStringRepresentation(i))
 
 
-# function to check the goal state
 def goalTest(state):
     if state == 12345678:
         return True
     return False
 
 
-# function to check if the start state solvable or not
 def isSolvable(digit):
     count = 0
     for i in range(0, 9):
@@ -108,16 +100,14 @@ def isSolvable(digit):
     return count % 2 == 0
 
 
-# breadth first search algorithm
 def BFS(inputState):
-    # generating start states of variables and data structures used in the algorithm
     start_time = time.time()
     q = []
     explored = {}
     parent = {}
     parent_cost = {}
     integer_state = int(inputState)
-    q.append(integer_state)  # here you place the input
+    q.append(integer_state)
     cnt = 0
     global bfs_counter
     global bfs_path
@@ -133,13 +123,11 @@ def BFS(inputState):
         bfs_depth = max(bfs_depth, parent_cost[state])
         if goalTest(state):
             path = getPath(parent, int(inputState))
-            # printPath(path)
             bfs_counter = cnt
             bfs_path = path
             bfs_cost = len(path) - 1
             time_bfs = float(time.time() - start_time)
             return 1
-        # generating childeren
         children = getChildren(getStringRepresentation(state))
         for child in children:
             child_int = int(child)
@@ -156,7 +144,6 @@ def BFS(inputState):
 
 
 def DFS(inputState):
-    # generating start states of variables and data structures used in the algorithm
     start_time = time.time()
     stack = []
     explored = {}
@@ -180,13 +167,11 @@ def DFS(inputState):
         dfs_depth = max(dfs_depth, parent_cost[state])
         if goalTest(state):
             path = getPath(parent, int(inputState))
-            # printPath(path)
             dfs_counter = cnt
             dfs_path = path
             dfs_cost = len(path) - 1
             time_dfs = float(time.time() - start_time)
             return 1
-        # generating childeren
         children = getChildren(getStringRepresentation(state))
         for child in children:
             child_int = int(child)
@@ -202,15 +187,13 @@ def DFS(inputState):
     return 0
 
 
-# function checking if state is valid or out of bounds
 def checkValid(i, j):
     if i >= 3 or i < 0 or j >= 3 or j < 0:
         return 0
     return 1
 
 
-# heuristic function using manhattan distance
-def getManhattanDistance(state):
+def getDistance(state):
     tot = 0
     for i in range(1, 9):
         goalX = int(i / 3)
@@ -223,15 +206,14 @@ def getManhattanDistance(state):
 
 
 def AStarSearch(inputState):
-    # generating start states of variables and data structures used in the algorithm
     start_time = time.time()
     integer_state = int(inputState)
     heap = []
     explored = {}
     parent = {}
     cost_map = {}
-    heapq.heappush(heap, (getManhattanDistance(inputState), integer_state))
-    cost_map[integer_state] = getManhattanDistance(inputState)
+    heapq.heappush(heap, (getDistance(inputState), integer_state))
+    cost_map[integer_state] = getDistance(inputState)
     heap_map = {}
     heap_map[integer_state] = 1
     global astar_counter
@@ -244,15 +226,13 @@ def AStarSearch(inputState):
         node = heapq.heappop(heap)
         state = node[1]
         string_state = getStringRepresentation(state)
-        parent_cost = node[0] - getManhattanDistance(string_state)
-        # handling the nodes that was renewed
+        parent_cost = node[0] - getDistance(string_state)
         if not state in explored:
             astar_depth = max(parent_cost, astar_depth)
         explored[state] = 1
 
         if goalTest(state):
             path = getPath(parent, int(inputState))
-            # printPath(path)
             astar_path = path
             astar_counter = (len(explored))
             astar_cost = len(path) - 1
@@ -260,10 +240,9 @@ def AStarSearch(inputState):
 
             return 1
 
-        # generating childeren
         children = getChildren(string_state)
         for child in children:
-            new_cost = getManhattanDistance(child)
+            new_cost = getDistance(child)
             child_int = int(child)
             if child_int not in explored and child not in heap_map:
                 heapq.heappush(heap, (parent_cost + new_cost + 1, child_int))
@@ -286,16 +265,14 @@ def AStarSearch(inputState):
 def uniform_cost_search(inputState):
     start_time = time.time()
 
-    # Converting inputState to integer for consistency
     integer_state = int(inputState)
     
-    # Priority queue, with (cost, state) tuples
     frontier = [(0, integer_state)]
     came_from = {integer_state: None}
     cost_so_far = {integer_state: 0}
 
     global ucs_counter, ucs_path, ucs_cost, ucs_depth, time_ucs
-    ucs_counter = 0  # To count the number of states explored
+    ucs_counter = 0
     ucs_depth = 0
 
     while frontier:
@@ -304,7 +281,6 @@ def uniform_cost_search(inputState):
         ucs_counter += 1
 
         if goalTest(current_state):
-            # Reconstruct path (if goal was found)
             ucs_path = getPath(came_from, integer_state)
             ucs_cost = len(ucs_path) - 1
             ucs_depth = max(ucs_depth, cost_so_far[current_state])
@@ -313,88 +289,103 @@ def uniform_cost_search(inputState):
 
         for next_state_str in getChildren(getStringRepresentation(current_state)):
             next_state = int(next_state_str)
-            new_cost = cost_so_far[current_state] + 1  # Assuming uniform cost
+            new_cost = cost_so_far[current_state] + 1
             if next_state not in cost_so_far or new_cost < cost_so_far[next_state]:
                 cost_so_far[next_state] = new_cost
                 priority = new_cost
                 heapq.heappush(frontier, (priority, next_state))
                 came_from[next_state] = current_state
 
-    # If no solution found
     ucs_path = []
     ucs_cost = 0
     time_ucs = time.time() - start_time
     return 0
 
-def depth_limited_search(inputState, limit=20):
+
+def depth_limited_search(inputState, limit=100):
     global dls_counter, dls_path, dls_cost, dls_depth, time_dls
     start_time = time.time()
-    stack = [(inputState, 0)]  # Stack contains tuples of (state, depth)
-    explored = set()
-    integer_state = int(inputState)
-    dls_counter = 0
-    dls_depth = 0
     
+    stack = [(inputState, 0)]
+    parentMap = {inputState: None}
+    visited = set([inputState])
+    dls_counter = 0
+    found = False
+
     while stack:
         state, depth = stack.pop()
         dls_counter += 1
-        if depth > limit:
-            continue
-
-        explored.add(state)
-
-        if goalTest(state):
-            dls_path = getPath(explored, integer_state)
+        
+        if goalTest(int(state)):
+            found = True
+            # Reconstruct the path
+            dls_path = []
+            while state is not None:
+                dls_path.append(int(state))
+                state = parentMap.get(str(state))
+            dls_path.reverse()
             dls_cost = len(dls_path) - 1
             dls_depth = depth
-            time_dls = time.time() - start_time
-            return 1  # Goal found
-
+            break
+        
         if depth < limit:
-            for child in getChildren(getStringRepresentation(integer_state)):
-                child_int = int(child)
-                if child_int not in explored:
-                    stack.append((child_int, depth + 1))
+            for child in getChildren(str(state)):
+                if child not in visited:
+                    visited.add(child)
+                    parentMap[child] = str(state)
+                    stack.append((child, depth + 1))
 
-    dls_path = []
-    dls_cost = 0
     time_dls = time.time() - start_time
-    return 0  # Goal not found within depth limit
+    return 1 if found else 0
+
 
 def iterative_deepening_search(inputState):
     global ids_counter, ids_path, ids_cost, ids_depth, time_ids
     start_time = time.time()
-    integer_state = int(inputState)
+    
     ids_counter = 0
-    ids_depth = 0
-
-    for limit in range(20):  # Arbitrary limit; adjust as needed
-        result = depth_limited_search(integer_state, limit)
-        if result == 1:
-            ids_path = dls_path  # Assuming dls_path is updated by DLS
-            ids_cost = dls_cost  # Assuming dls_cost is updated by DLS
-            ids_depth = limit
-            time_ids = time.time() - start_time
-            return 1  # Goal found
-
-    ids_path = []
-    ids_cost = 0
+    found = False
+    depth_limit = 0
+    MAX_DEPTH = 20
+    
+    while not found and depth_limit <= MAX_DEPTH:
+        stack = [(inputState, 0)]
+        visited = set([inputState])
+        
+        while stack:
+            current_state, current_depth = stack.pop()
+            ids_counter += 1
+            
+            if goalTest(current_state):
+                found = True
+                ids_path = [current_state]
+                ids_cost = current_depth
+                ids_depth = current_depth
+                break
+            
+            if current_depth < depth_limit:
+                for child in getChildren(current_state):
+                    if child not in visited:
+                        visited.add(child)
+                        stack.append((child, current_depth + 1))
+        
+        depth_limit += 1
+    
     time_ids = time.time() - start_time
-    return 0  # Goal not found
+    return 1 if found else 0
+
 
 def greedy_search(inputState):
     start_time = time.time()
 
-    # Converting inputState to integer for consistency, if necessary
     integer_state = int(inputState) if isinstance(inputState, str) else inputState
     
-    # Priority queue, with (heuristic cost, state) tuples
-    frontier = [(getManhattanDistance(getStringRepresentation(integer_state)), integer_state)]
+    frontier = [(getDistance(getStringRepresentation(integer_state)), integer_state)]
     came_from = {integer_state: None}
     
     global greedy_counter, greedy_path, greedy_cost, greedy_depth, time_greedy
     greedy_counter = 0
-    greedy_depth = 0  # This might not be accurate for greedy search, as it doesn't consider path cost
+    greedy_depth = 0
 
     while frontier:
         current_heuristic, current_state = heapq.heappop(frontier)
@@ -402,18 +393,16 @@ def greedy_search(inputState):
         greedy_counter += 1
 
         if goalTest(current_state):
-            # Reconstruct path (if goal was found)
             greedy_path = getPath(came_from, integer_state)
             greedy_cost = len(greedy_path) - 1
             time_greedy = time.time() - start_time
-            return 1  # Indicate success
+            return 1
 
         for next_state_str in getChildren(getStringRepresentation(current_state)):
             next_state = int(next_state_str)
             if next_state not in came_from:
-                heapq.heappush(frontier, (getManhattanDistance(getStringRepresentation(next_state)), next_state))
+                heapq.heappush(frontier, (getDistance(getStringRepresentation(next_state)), next_state))
                 came_from[next_state] = current_state
 
-    # If no solution found
     time_greedy = time.time() - start_time
-    return 0  # Indicate failure
+    return 0
